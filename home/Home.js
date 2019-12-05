@@ -5,18 +5,16 @@ import { createAppContainer, NavigationScreenProp } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
 
-// const { navigation } = this.props;
-
-export class HomeScreen extends React.Component<{navigation: any}> {
+export class HomeScreen extends React.Component {
   static navigationOptions = {
-    title: 'Welcome',
+    title: 'Home Screen',
   };
   render() {
-    const { navigate } = this.props.navigation;
+    const { navigate, replace } = this.props.navigation;
     return (
       <Button
-        title="Go to Jane's profile"
-        onPress={() => navigate('Profile', {name: 'Jane'})}
+        title="Login - Register"
+        onPress={() => replace('LoginRegister')}
       />
     );
   }

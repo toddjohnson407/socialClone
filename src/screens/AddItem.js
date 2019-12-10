@@ -1,85 +1,115 @@
 
 import React from 'react';
-import { View, Text, Alert, TextInput, StyleSheet, TouchableHighlight } from 'react-native';
+import { View, Alert, TextInput, StyleSheet, TouchableHighlight } from 'react-native';
+import { Icon, Text, Item, Form, Input, Button, Container, Content, Grid, Row, Body, H2 } from 'native-base';
 
-import { db } from '../config';
+import { db, storage } from '../config';
 
-let addItem = item => {
+import getPermission from '../utils/getPermission';
+import uriToBlob from '../utils/uriToBlob';
+import uploadPhoto from '../utils/uploadPhoto';
+import selectPhoto from '../utils/selectPhoto';
+
+let addItem = (item, imageUrl) => {
   db.collection('posts').doc().set({
     title: item,
-    image: 'testing post image'
+    image: imageUrl
   }).then(res => console.log('Success', res))
     .catch(err => console.log('Error', err))
 };
 
 export class AddItem extends React.Component {
 
-  state = { name: '' };
+  state = { name: '', imageUrl: '', imageUri: '', errorMessage: null };
 
   handleChange = e => {
     this.setState({
       name: e.nativeEvent.text
     });
   };
-  handleSubmit = () => {
-    addItem(this.state.name);
-    Alert.alert('Item saved successfully');
+
+  handleSubmit = async () => {
+    if (this.state.imageUri && this.state.name) {
+      let imageUrl = await uploadPhoto(this.state.imageUri);
+      this.setState({ imageUrl });
+      addItem(this.state.name, this.state.imageUrl);
+      Alert.alert('Item saved successfully');
+    }
   };
+  
+  _choosePhoto = async () => {
+    selectPhoto().then(uri => this.setState({ imageUri: uri }));
+  }
 
   render() {
     return (
-      <View style={styles.main}>
-        <Text style={styles.title}>Add Item</Text>
-        <TextInput style={styles.itemInput} onChange={this.handleChange} />
-        <TouchableHighlight
-          style={styles.button}
-          underlayColor="white"
-          onPress={this.handleSubmit}
-        >
-          <Text style={styles.buttonText}>Add</Text>
-        </TouchableHighlight>
-      </View>
+      <Container>
+        <Content contentContainerStyle={styles.content}>
+          <Grid>
+            <Row size={2}>
+              <Body>
+                <Text style={styles.header}>New Post</Text>
+                {this.state.errorMessage &&
+                  <Text style={{ color: 'red' }}>
+                    {this.state.errorMessage}
+                  </Text>}
+              </Body>
+            </Row>
+            <Row size={1}>
+              <Form style={styles.form}>
+                <Item stackedLabel>
+                  <Input
+                    placeholder="Post Title"
+                    autoCapitalize="none"
+                    onChangeText={name => this.setState({ name })}
+                    value={this.state.name}                    
+                  />
+                </Item>
+              </Form>    
+            </Row>    
+            <Row size={3}>
+              <Body>
+                <Button bordered onPress={this._choosePhoto}>
+                  <Text>Select Photo</Text>
+                </Button>
+              </Body>
+            </Row>    
+            <Row size={1}>
+              <Body>
+                <Button transparent onPress={this.handleSubmit}>
+                  <Icon name="ios-checkmark-circle" style={{fontSize: 34}}/>
+                </Button>
+              </Body>
+            </Row>
+          </Grid>
+
+        </Content>
+      </Container>
     );
   }
 }
+
+
+
+
 const styles = StyleSheet.create({
-  main: {
+  signup: {
+    color: 'blue'
+  },
+  container: {
     flex: 1,
-    padding: 30,
-    flexDirection: 'column',
     justifyContent: 'center',
-    backgroundColor: '#6565fc'
+    alignItems: 'center'
   },
-  title: {
-    marginBottom: 20,
-    fontSize: 25,
-    textAlign: 'center'
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  itemInput: {
-    height: 50,
-    padding: 4,
-    marginRight: 5,
-    fontSize: 23,
-    borderWidth: 1,
-    borderColor: 'white',
-    borderRadius: 8,
-    color: 'white'
+  header: {
+    fontSize: 25
   },
-  buttonText: {
-    fontSize: 18,
-    color: '#111',
-    alignSelf: 'center'
-  },
-  button: {
-    height: 45,
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderColor: 'white',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 10,
-    marginTop: 10,
-    alignSelf: 'stretch',
-    justifyContent: 'center'
+  form: {
+    width: 325
   }
 });

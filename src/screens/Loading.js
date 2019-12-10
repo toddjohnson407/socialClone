@@ -10,6 +10,7 @@ import { auth } from '../config';
 export class Loading extends React.Component {
 
   componentDidMount() {
+    auth.currentUser && this.props.navigation.navigate('Home');
     auth.onAuthStateChanged(user => this.props.navigation.navigate(user ? 'Home' : 'SignUp'))
   }
 

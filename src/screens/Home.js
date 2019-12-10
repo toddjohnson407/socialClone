@@ -4,7 +4,10 @@ import { StyleSheet, Text, View, Button } from 'react-native';
 import { createAppContainer, NavigationScreenProp } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-import { db } from '../config';
+import { db, auth } from '../config';
+
+import logout from '../utils/logout';
+
 
 let posts = db.collection('posts').doc('ZZPygl5y7IyJIgYDrh6p');
 
@@ -13,8 +16,10 @@ export class Home extends React.Component {
     title: 'Home Screen',
   };
   
+  state = { user: auth.currentUser }
+
   render() {
-    posts.get().then(doc => console.log(doc.data())).catch(err => console.log(err, 'ERROR'));
+    // posts.get().then(doc => console.log(doc.data())).catch(err => console.log(err, 'ERROR'));
     const { navigate, replace } = this.props.navigation;
     return (
       <View>
@@ -32,6 +37,11 @@ export class Home extends React.Component {
           title="Select Photo"
           color="pink"
           onPress={() => this.props.navigation.navigate('SelectPhoto')}
+        />
+        <Button
+          title="Logout"
+          color="pink"
+          onPress={() => logout()}
         />
       </View>
     );

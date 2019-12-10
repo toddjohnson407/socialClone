@@ -9,24 +9,31 @@ import { View, Card, CardItem, Grid, Col, Row, Container, Header, Content, Butto
 
 export class SignUp extends React.Component {
 
-  state = { email: '', password: '', errorMessage: null }
+  state = { email: '', password: '', username: '', username: '', errorMessage: null }
 
   handleSignUp = () => {
     auth.createUserWithEmailAndPassword(this.state.email, this.state.password)
-      .then(() => this.props.navigation.navigate('Main'))
-      .catch(error => this.setState({ errorMessage: error.message }))
+      .then(() => {
+
+        let user = auth.currentUser;
+        user.updateProfile({ displayName: this.state.username }).then(res => this.props.navigation.navigate('Main')).catch(err => console.log(err))
+      }).catch(error => this.setState({ errorMessage: error.message }))
   }
+
+  goToLogin = () => this.props.navigation.navigate('Login');
 
   render() {
     return (
       <Container>
         <Content contentContainerStyle={styles.content}>
           <Grid>
-            <Row size={1}>
+            <Row size={2}>
               <Body>
-
-
-                <Text>Create an Account</Text>
+                <Text style={styles.header}>Create an Account</Text>
+                {this.state.errorMessage &&
+                  <Text style={{ color: 'red' }}>
+                    {this.state.errorMessage}
+                  </Text>}
               </Body>
             </Row>
             <Row size={2}>
@@ -39,6 +46,14 @@ export class SignUp extends React.Component {
                     value={this.state.email}                    
                   />
                 </Item>
+                <Item stackedLabel>
+                  <Input
+                    placeholder="Username"
+                    autoCapitalize="none"
+                    onChangeText={username => this.setState({ username })}
+                    value={this.state.username}                    
+                  />
+                </Item>
 
                 <Item stackedLabel>
                   <Input 
@@ -49,17 +64,22 @@ export class SignUp extends React.Component {
                     value={this.state.password}
                   />
                 </Item>
-              </Form>              
+              </Form>    
             </Row>
+            <Row size={1}>
+              <Body>
+                <Button transparent onPress={this.goToLogin}>
+                  <Text style={styles.signup}>Already have an account? Login</Text>
+                </Button>
+              </Body>
+            </Row>          
             <Row size={2}>
               <Body>
                 <Button transparent onPress={this.handleSignUp}>
-                  <Icon name="ios-checkmark-circle" style={{fontSize: 40}}/>
+                  <Icon name="ios-checkmark-circle" style={{fontSize: 34}}/>
                 </Button>
               </Body>
             </Row>
-            {/* <Row size={0}></Row> */}
-
           </Grid>
 
         </Content>
@@ -69,6 +89,9 @@ export class SignUp extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  signup: {
+    color: 'blue'
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -78,6 +101,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  header: {
+    fontSize: 25
   },
   form: {
     // backgroundColor: 'pink',

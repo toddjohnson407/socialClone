@@ -7,6 +7,8 @@ import { db, auth, storage } from '../config';
 import logout from '../utils/logout';
 
 let posts = db.collection('posts');
+let profiles = db.collection('profiles');
+let users = db.collection('users');
 
 export class ListItems extends Component {
 
@@ -16,8 +18,9 @@ export class ListItems extends Component {
   async _loadPosts(data) {
     let urls = [];
     // Push each download url to the posts []
-    for (let post of data) urls.push({ key: await storage.ref(post.image).getDownloadURL(), title: post.title });
+    for (let post of data) urls.push({ key: await storage.ref(post.image).getDownloadURL(), title: post.title, profile: await profiles.doc(post.userRef.id).get() });
     this.setState({ posts: urls });
+
   }
 
   componentDidMount() {
@@ -35,6 +38,9 @@ export class ListItems extends Component {
           {/* <Button onPress={logout}><Text>logout</Text></Button>   */}
           <FlatList data={this.state.posts} renderItem={({item}) => 
             <Grid style={styles.postItem}>
+              <Row size={1} style={styles.postTitle}>
+                <Text>{ item.profile.data().name }</Text>
+              </Row>
               <Row size={2}>
                 <Image style={styles.postImage} source={{ uri: item.key }}/>
               </Row>

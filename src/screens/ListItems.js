@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import { View, FlatList, Image, StyleSheet } from 'react-native';
 import { List, ListItem, Grid, Row, Text, Container, Content, Button } from 'native-base'
@@ -8,25 +7,22 @@ import logout from '../utils/logout';
 
 let posts = db.collection('posts');
 let profiles = db.collection('profiles');
-let users = db.collection('users');
 
 export class ListItems extends Component {
 
   state = { posts: [] }
-
 
   async _loadPosts(data) {
     let urls = [];
     // Push each download url to the posts []
     for (let post of data) urls.push({ key: await storage.ref(post.image).getDownloadURL(), title: post.title, profile: await profiles.doc(post.userRef.id).get() });
     this.setState({ posts: urls });
-
   }
 
   componentDidMount() {
     posts.get().then(data => {
       let posts = [];
-      data.forEach(doc => doc.data().image.includes('posts/') && posts.push(doc.data()));
+      data.forEach(doc => doc.data().imageRef.includes('posts/') && posts.push(doc.data()));
       this._loadPosts(posts);
     }).catch(err => console.log(err, 'ERROR'));
   }
@@ -53,6 +49,7 @@ export class ListItems extends Component {
       </Container>
     );
   }
+
 }
 
 const styles = StyleSheet.create({

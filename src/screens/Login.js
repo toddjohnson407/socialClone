@@ -7,7 +7,9 @@ import { auth } from '../config';
 import { View, Card, CardItem, Grid, Col, Row, Container, Header, Content, Button, Text, Footer, Left, Body, Title, Icon, Right, Spinner, Input, Label, Form, Item } from 'native-base';
 
 export class Login extends React.Component {
+  
   state = { email: '', password: '', errorMessage: null }
+  
   handleLogin = () => {
     auth.signInWithEmailAndPassword(this.state.email, this.state.password)
       .then(() => this.props.navigation.navigate('Main'))

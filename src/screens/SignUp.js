@@ -2,24 +2,36 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { auth } from '../config';
+import { db, auth, storage, createTimestamp } from '../config';
 
-import { View, Card, CardItem, Grid, Col, Row, Container, Header, Content, Button, Text, Footer, Left, Body, Title, Icon, Right, Spinner, Input, Label, Form, Item } from 'native-base';
+import { Card, CardItem, Grid, Col, Row, Container, Header, Content, Button, Text, Footer, Left, Body, Title, Icon, Right, Spinner, Input, Label, Form, Item } from 'native-base';
 
+let profiles = db.collection('profiles');
+
+/** Formats user data for sending to the database */
+let newProfile = (username, name, created, userId, bio = '', avatarRef = '', followers = [], following = []) => {
+  let profile = { username, name, created, userId, followers, following, avatarRef, bio };
+  return profile;
+}
+/** Create a new Profile document for the newly created user */
+let createProfile = (newProfile) => {
+  db.collection('profiles').doc().set(newProfile).then(res => console.log('Profile created'))
+    .catch(err => console.log('Error creating a profile for the user:', err))
+}
 
 export class SignUp extends React.Component {
 
-  state = { email: '', password: '', username: '', username: '', errorMessage: null }
+  state = { email: '', password: '', name: '', username: '', errorMessage: null }
 
   handleSignUp = () => {
-    auth.createUserWithEmailAndPassword(this.state.email, this.state.password)
-      .then(() => {
+    auth.createUserWithEmailAndPassword(this.state.email, this.state.password).then((res) => {
 
-        let user = auth.currentUser;
-        user.updateProfile({ displayName: this.state.username }).then(res => this.props.navigation.navigate('Main')).catch(err => console.log(err))
-      }).catch(error => this.setState({ errorMessage: error.message }))
+      let newProfile = newProfile(this.state.username, this.state.name, createTimestamp(), res.user.uid);
+      createProfile(newProfile);
+
+    }).catch(error => this.setState({ errorMessage: error.message }))
   }
-
+      
   goToLogin = () => this.props.navigation.navigate('Login');
 
   render() {
@@ -27,7 +39,8 @@ export class SignUp extends React.Component {
       <Container>
         <Content contentContainerStyle={styles.content}>
           <Grid>
-            <Row size={2}>
+
+            <Row size={1}>
               <Body>
                 <Text style={styles.header}>Create an Account</Text>
                 {this.state.errorMessage &&
@@ -36,50 +49,54 @@ export class SignUp extends React.Component {
                   </Text>}
               </Body>
             </Row>
+
             <Row size={2}>
               <Form style={styles.form}>
+
                 <Item stackedLabel>
-                  <Input
-                    placeholder="Email"
-                    autoCapitalize="none"
-                    onChangeText={email => this.setState({ email })}
-                    value={this.state.email}                    
-                  />
-                </Item>
-                <Item stackedLabel>
-                  <Input
-                    placeholder="Username"
-                    autoCapitalize="none"
-                    onChangeText={username => this.setState({ username })}
-                    value={this.state.username}                    
-                  />
+                  <Input placeholder="Name" autoCapitalize="words" value={this.state.name}
+                    onChangeText={name => this.setState({ name })}
+                    />
                 </Item>
 
                 <Item stackedLabel>
-                  <Input 
-                    secureTextEntry
-                    placeholder="Password"
-                    autoCapitalize="none"
-                    onChangeText={password => this.setState({ password })}
-                    value={this.state.password}
-                  />
+                  <Input placeholder="Email" autoCapitalize="none" value={this.state.email}
+                    onChangeText={email => this.setState({ email })}
+                    />
                 </Item>
+
+                <Item stackedLabel>
+                  <Input
+                    placeholder="Username" value={this.state.username} autoCapitalize="none"
+                    onChangeText={username => this.setState({ username })}       
+                    />
+                </Item>
+
+                <Item stackedLabel>
+                  <Input secureTextEntry placeholder="Password" autoCapitalize="none" value={this.state.password}
+                    onChangeText={password => this.setState({ password })}
+                    />
+                </Item>
+
               </Form>    
             </Row>
-            <Row size={1}>
+
+            <Row size={0}>
               <Body>
                 <Button transparent onPress={this.goToLogin}>
                   <Text style={styles.signup}>Already have an account? Login</Text>
                 </Button>
               </Body>
             </Row>          
-            <Row size={2}>
+
+            <Row size={1}>
               <Body>
-                <Button transparent onPress={this.handleSignUp}>
-                  <Icon name="ios-checkmark-circle" style={{fontSize: 34}}/>
+                <Button transparent onPress={this.handleSignUp} style={{ height: 70 }}>
+                  <Icon name="ios-checkmark-circle" style={{fontSize: 50}}/>
                 </Button>
               </Body>
             </Row>
+
           </Grid>
 
         </Content>
@@ -89,9 +106,7 @@ export class SignUp extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  signup: {
-    color: 'blue'
-  },
+  signup: { color: 'blue' },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -102,13 +117,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  header: {
-    fontSize: 25
-  },
-  form: {
-    // backgroundColor: 'pink',
-    width: 325
-  },
+  header: { fontSize: 25 },
+  form: { width: 325 },
   textInput: {
     height: 40,
     width: '90%',
@@ -116,4 +126,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginTop: 8
   }
-})
+});

@@ -7,9 +7,12 @@ import { Container, Header, Content, Button, Text, Footer, Left, Body, Title, Ic
 
 import { auth } from '../config';
 
+import logout from '../utils/logout';
+
 export class Loading extends React.Component {
 
   componentDidMount() {
+    // logout()
     auth.currentUser && this.props.navigation.navigate('Home');
     auth.onAuthStateChanged(user => this.props.navigation.navigate(user ? 'Home' : 'SignUp'))
   }

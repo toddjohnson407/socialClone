@@ -3,42 +3,52 @@ import React from 'react';
 import { View, Alert, TextInput, StyleSheet, TouchableHighlight } from 'react-native';
 import { Icon, Text, Item, Form, Input, Button, Container, Content, Grid, Row, Body, H2 } from 'native-base';
 
-import { db, storage } from '../config';
+import { db, storage, createTimestamp } from '../config';
 
 import getPermission from '../utils/getPermission';
 import uriToBlob from '../utils/uriToBlob';
 import uploadPhoto from '../utils/uploadPhoto';
 import selectPhoto from '../utils/selectPhoto';
+import getProfile from '../utils/getProfile';
 
-let addItem = (item, imageUrl) => {
-  db.collection('posts').doc().set({
-    title: item,
-    image: imageUrl
-  }).then(res => console.log('Success', res))
+class Post {
+  constructor(
+    description, imageRef, profileId, created, 
+    likes = [], comments = []
+  ) { }
+}
+
+let addPost = (newPost) => {
+  db.collection('posts').doc().set(newPost)
+    .then(res => console.log('Success', res))
     .catch(err => console.log('Error', err))
 };
 
 export class AddItem extends React.Component {
 
-  state = { name: '', imageUrl: '', imageUri: '', errorMessage: null };
-
-  handleChange = e => {
-    this.setState({
-      name: e.nativeEvent.text
-    });
-  };
+  state = { description: '', imageUrl: '', imageUri: '', errorMessage: null, profile: null };
 
   handleSubmit = async () => {
     if (this.state.imageUri && this.state.name) {
+
       let imageUrl = await uploadPhoto(this.state.imageUri);
-      this.setState({ imageUrl });
-      addItem(this.state.name, this.state.imageUrl);
-      Alert.alert('Item saved successfully');
+      let timestamp = await createTimestamp();
+
+      let newPost = new Post(this.state.description, imageUrl, this.state.profile.id, timestamp);
+      addPost(newPost);
     }
   };
   
   _choosePhoto = async () => {
-    selectPhoto().then(uri => this.setState({ imageUri: uri }));
+    selectPhoto()
+      .then(uri => this.setState({ imageUri: uri }))
+      .catch(err => console.log('Error getting photo uri:', err));
+  }
+
+  async componentDidMount() {
+    let profile = await getProfile();
+    this.setState({ profile });
+    console.log(this.state.profile);
   }
 
   render() {
@@ -59,10 +69,10 @@ export class AddItem extends React.Component {
               <Form style={styles.form}>
                 <Item stackedLabel>
                   <Input
-                    placeholder="Post Title"
+                    placeholder="Post Description"
                     autoCapitalize="none"
-                    onChangeText={name => this.setState({ name })}
-                    value={this.state.name}                    
+                    onChangeText={description => this.setState({ description })}
+                    value={this.state.description}                    
                   />
                 </Item>
               </Form>    

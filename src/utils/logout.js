@@ -1,5 +1,10 @@
 import { auth } from '../config';
 
+import { StackActions, NavigationActions } from 'react-navigation';
+import clearNav from './clearNav';
+
 export default async function logout() {
-  auth.signOut().then(res => this.props.navigation.navigate('SignUp')).catch(err => console.log(err));
+  await auth.signOut();
+  let action = await clearNav('SignUp');
+  return action;
 }

@@ -3,6 +3,7 @@ import React from 'react'
 import { StyleSheet } from 'react-native';
 
 import { auth } from '../config';
+import clearNav from '../utils/clearNav';
 
 import { View, Card, CardItem, Grid, Col, Row, Container, Header, Content, Button, Text, Footer, Left, Body, Title, Icon, Right, Spinner, Input, Label, Form, Item } from 'native-base';
 
@@ -12,7 +13,7 @@ export class Login extends React.Component {
   
   handleLogin = () => {
     auth.signInWithEmailAndPassword(this.state.email, this.state.password)
-      .then(() => this.props.navigation.navigate('Main'))
+      .then(() => clearNav('Loading').then(action => this.props.navigation.dispatch(action)))
       .catch(error => this.setState({ errorMessage: error.message }))
   }
 

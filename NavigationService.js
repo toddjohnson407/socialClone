@@ -3,7 +3,7 @@
  * the use of Component props
  */
 
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions, StackActions } from 'react-navigation';
 
 let _navigator;
 
@@ -19,8 +19,6 @@ function navigate(routeName, params) {
     })
   );
 }
-
-// add other navigation functions that you need and export them
 
 export default {
   navigate,

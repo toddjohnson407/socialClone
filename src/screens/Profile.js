@@ -1,59 +1,127 @@
 import React from 'react';
-import { Modal, View } from 'react-native';
+import { View, StyleSheet, Text, FlatList, Image } from 'react-native';
+import { Button, Form, Grid, Row, Body, Title, Header, Right, Left, Icon, Container, Content, Thumbnail } from 'native-base';
 
-import { Text, Button, Form, Grid, Row, Body, Title, Header, Right, Left, Icon, Container, Content } from 'native-base';
+import { db, auth, storage } from '../config';
+import getProfile from '../utils/getProfile';
+import getProfilePosts from '../utils/getProfilePosts';
 
-export class ProfileModal extends React.Component {
+export class Profile extends React.Component {
 
-  closeModal = () => this.props.navigation.navigate('Home');
+  state = { posts: [], id: null, username: null, avatarRef: null, name: null, bio: null, followers: [], following: [],  }
+
+  _loadPosts = async (data) => {
+    let urls = [];
+    // Push each download url to the posts []
+    for (let post of data) urls.push({ key: await storage.ref(post.imageRef).getDownloadURL(), description: post.description });
+    this.setState({ posts: urls });
+  }
+
+  async componentDidMount() {
+    let profile = await getProfile();
+    let posts = await getProfilePosts(profile.id);
+    this.setState({...{posts: []}, ...profile});
+    await this._loadPosts(posts);
+    console.log(this.state);
+    // this.setState({ posts: await this._loadPosts(posts) });
+    this.setState({ avatarRef: await storage.ref('avatars/testavatar.jpg').getDownloadURL() });
+  }
 
   render() {
+    if (!this.state.avatarRef || !this.state.posts) return null
     return (
-      <Modal
-        onPress={this.press}
-        animationType="slide"
-        transparent={false}
-        presentationStyle="pageSheet"
-        onDismiss={this.closeModal}
-        onRequestClose={this.closeModal}
-        onSwipe={this.closeModal}
-        visible={true}
-      >
+      <View style={styles.profile}>
+        
+        <View style={styles.username}><Text style={styles.usernameText}>{this.state.username}</Text></View>
 
-        <Container>
-          <Header>
-            <Left style={{flex:1}}/>
-            <Body style={{flex:1}}>
-              <Title>Your Profile</Title>
-            </Body>
-            <Right style={{flex:1}}>
-              <Button transparent onPress={this.closeModal}>
-                <Icon name='person'/>
-              </Button>
-            </Right>
-          </Header>
-          <Content>
-            <Grid>
-              <Row size={1}>
-                {/* <Text style={{ color: 'rgba(33,240,211,1)', fontSize: 25, fontWeight: 'bold' }}>Your Profile</Text> */}
-              </Row>
-              <Row size={1}>
+        <View style={styles.header}>
 
-              </Row>
-              <Row size={1}>
+          <View style={styles.profilePicture}>
+            <Thumbnail large source={{ uri: this.state.avatarRef }}></Thumbnail>
+          </View>
 
-              </Row>
-              <Row size={1}>
+          <View style={styles.subheader}>
 
-              </Row>
-              <Row size={1}>
+            <View style={styles.headerSection}>
+              <Text style={styles.sectionCounter}>{this.state.posts.length}</Text>
+              <Text style={styles.sectionLabel}>{this.state.posts.length === 1 ? 'Post' : 'Posts'}</Text>
+            </View>
+            <View style={styles.headerSection}>
+              <Text style={styles.sectionCounter}>{this.state.following.length}</Text>
+              <Text style={styles.sectionLabel}>Followers</Text>
 
-              </Row>
-            </Grid>
-          </Content>
-        </Container>
-
-      </Modal>
+            </View>
+            <View style={styles.headerSection}>
+              <Text style={styles.sectionCounter}>{this.state.following.length}</Text>
+              <Text style={styles.sectionLabel}>Following</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.postsCtn}>
+          <FlatList numColumns={3} data={this.state.posts} renderItem={({item}) => 
+            <Image style={styles.post} source={{ uri: item.key }}></Image>
+          }/>
+        </View>
+      </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  postsCtn: {
+    flex: 6,
+    paddingTop: 20,
+    backgroundColor: 'white'
+  },
+  post: {
+    width: 125,
+    height: 125,
+  },
+  username: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 0
+  },
+  usernameText: {
+    fontSize: 20,
+  },
+  profile: {
+    height: '100%',
+    backgroundColor: 'white'
+  },
+  header: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    paddingRight: 20,
+    paddingLeft: 20,
+    backgroundColor: 'white',
+    paddingBottom: 20
+  },
+  profilePicture: {
+    flex: 1,
+  },
+  subheader: {
+    flex: 3,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+  },
+  headerSection: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionCounter: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    color: 'black'
+  },
+  sectionLabel: {
+    fontSize: 15,
+  }
+});

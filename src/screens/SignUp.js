@@ -32,7 +32,7 @@ export class SignUp extends React.Component {
     }).catch(error => this.setState({ errorMessage: error.message }))
   }
       
-  goToLogin = () => this.props.navigation.navigate('Login');
+  goToLogin = () => this.props.navigation.replace('Login');
 
   render() {
     return (

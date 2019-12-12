@@ -6,14 +6,14 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 
-import { Home } from './src/screens/Home';
 import { AddItem } from './src/screens/AddItem';
 import { ListItems } from './src/screens/ListItems';
 import { SelectPhoto } from './src/screens/SelectPhoto';
 import { SignUp } from './src/screens/SignUp';
 import { Login } from './src/screens/Login';
 import { Loading } from './src/screens/Loading';
-import { ProfileModal } from './src/screens/Profile';
+import { Profile } from './src/screens/Profile';
+import { Settings } from './src/screens/Settings';
 
 import { AppLoading } from 'expo';
 import { Container, Text, StyleProvider, Header, Left, Right, Body, Title, Icon, Button } from 'native-base';
@@ -30,19 +30,24 @@ import NavigationService from './NavigationService.js';
 
 const TabNavigator = createMaterialBottomTabNavigator(
   {
-    AddItem: { screen: AddItem, navigationOptions: {
-      tabBarIcon: (({tintColor}) => (
-        <View><Icon style={[{color: tintColor, fontSize: 26}]} name="add-circle"/></View>
-      ))
-    }},
     List: { screen: ListItems, navigationOptions: {
       tabBarIcon: (({tintColor}) => (
         <View><Icon style={[{color: tintColor, fontSize: 26}]} name="home"/></View>
       )),
     }},
+    AddItem: { screen: AddItem, navigationOptions: {
+      tabBarIcon: (({tintColor}) => (
+        <View><Icon style={[{color: tintColor, fontSize: 26}]} name="add-circle"/></View>
+      ))
+    }},
+    Profile: { screen: Profile, navigationOptions: {
+      tabBarIcon: (({tintColor}) => (
+        <View><Icon style={[{color: tintColor, fontSize: 26}]} name="person"/></View>
+      )),
+    }},
   },
   {
-    initialRouteName: 'List',
+    initialRouteName: 'Profile',
     shifting: false,
     labeled: false,
     activeColor: '#21f0d3',
@@ -51,19 +56,19 @@ const TabNavigator = createMaterialBottomTabNavigator(
   }
 );
 
-const ModalNavigator = createStackNavigator(
-  { Profile: { screen: ProfileModal } },
-  { mode: 'modal', gesturesEnabled: false }
-);
+// const ModalNavigator = createStackNavigator(
+//   { Profile: { screen: ProfileModal } },
+//   { mode: 'modal', gesturesEnabled: false }
+// );
 
 const MainNavigator = createStackNavigator(
   {
     Home: { screen: TabNavigator },
     SelectPhoto: { screen: SelectPhoto },
-    Profile: ModalNavigator,
     Login,
     SignUp,
-    Loading
+    Loading,
+    Settings
   },
   {
     headerMode: 'none',
@@ -89,9 +94,9 @@ export default class App extends React.Component {
     });
     this.setState({ isReady: true });
   }
-
-  openProfile = () => NavigationService.navigate('Profile', { isVisible: true });
   
+  openSettings = () => NavigationService.navigate('Settings');
+
   render () {
     if (!this.state.isReady) return <AppLoading/>
     return (
@@ -100,11 +105,11 @@ export default class App extends React.Component {
           <Header>
             <Left style={{flex:1}}/>
             <Body style={{flex:1}}>
-              <Title>Social Clone</Title>
+              <Title>ShitGram</Title>
             </Body>
             <Right style={{flex:1}}>
-              <Button transparent onPress={this.openProfile}>
-                <Icon name='person'/>
+              <Button transparent onPress={this.openSettings}>
+                <Icon name='settings'/>
               </Button>
             </Right>
           </Header>

@@ -18,6 +18,11 @@ class Post {
   ) { }
 }
 
+let formatPost = (description, imageRef, profileId, created, likes = [], comments = []) => {
+  let post = { description, imageRef, profileId, created, likes, comments };
+  return post;
+}
+
 let addPost = (newPost) => {
   db.collection('posts').doc().set(newPost)
     .then(res => console.log('Success', res))
@@ -26,15 +31,17 @@ let addPost = (newPost) => {
 
 export class AddItem extends React.Component {
 
-  state = { description: '', imageUrl: '', imageUri: '', errorMessage: null, profile: null };
+  state = { description: '', imageUri: '', errorMessage: null, profile: null };
 
   handleSubmit = async () => {
-    if (this.state.imageUri && this.state.name) {
+    if (this.state.imageUri && this.state.description) {
 
-      let imageUrl = await uploadPhoto(this.state.imageUri);
+      let imageRef = await uploadPhoto(this.state.imageUri);
       let timestamp = await createTimestamp();
 
-      let newPost = new Post(this.state.description, imageUrl, this.state.profile.id, timestamp);
+      let newPost = formatPost(this.state.description, imageRef, this.state.profile.id, timestamp);
+      console.log(newPost);
+
       addPost(newPost);
     }
   };
@@ -48,7 +55,6 @@ export class AddItem extends React.Component {
   async componentDidMount() {
     let profile = await getProfile();
     this.setState({ profile });
-    console.log(this.state.profile);
   }
 
   render() {

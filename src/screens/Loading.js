@@ -8,19 +8,17 @@ import { Container, Header, Content, Button, Text, Footer, Left, Body, Title, Ic
 import { auth } from '../config';
 
 import logout from '../utils/logout';
+import clearNav from '../utils/clearNav';
 
 export class Loading extends React.Component {
 
   componentDidMount() {
-    // logout()
-    auth.currentUser && this.props.navigation.navigate('Home');
-    auth.onAuthStateChanged(user => this.props.navigation.navigate(user ? 'Home' : 'SignUp'))
+    auth.currentUser && clearNav('Home').then(action => this.props.navigation.dispatch(action))
+    auth.onAuthStateChanged(user => clearNav(user ? 'Home' : 'SignUp').then(action => this.props.navigation.dispatch(action)));
   }
 
   render() {
-    return (
-      <Container style={styles.container}><Spinner/></Container>
-    );
+    return (<Container style={styles.container}><Spinner/></Container>);
   }
 }
 const styles = StyleSheet.create({

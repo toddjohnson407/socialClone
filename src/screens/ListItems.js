@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, FlatList, Image, StyleSheet } from 'react-native';
-import { List, ListItem, Grid, Row, Text, Container, Content, Button } from 'native-base'
+import { View, FlatList, Image, StyleSheet, Text } from 'react-native';
+import { List, ListItem, Grid, Row, Col, Container, Content, Button, Thumbnail, Icon } from 'native-base'
 
 import { db, auth, storage } from '../config';
 import logout from '../utils/logout';
@@ -15,7 +15,7 @@ export class ListItems extends Component {
   async _loadPosts(data) {
     let urls = [];
     // Push each download url to the posts []
-    for (let post of data) urls.push({ key: await storage.ref(post.image).getDownloadURL(), title: post.title, profile: await profiles.doc(post.userRef.id).get() });
+    for (let post of data) urls.push({ key: await storage.ref(post.imageRef).getDownloadURL(), description: post.description, profile: await profiles.doc(post.profileId).get() });
     this.setState({ posts: urls });
   }
 
@@ -31,19 +31,27 @@ export class ListItems extends Component {
     return (
       <Container>
         <Content>
-          {/* <Button onPress={logout}><Text>logout</Text></Button>   */}
           <FlatList data={this.state.posts} renderItem={({item}) => 
-            <Grid style={styles.postItem}>
-              <Row size={1} style={styles.postTitle}>
-                <Text>{ item.profile.data().name }</Text>
-              </Row>
-              <Row size={2}>
-                <Image style={styles.postImage} source={{ uri: item.key }}/>
-              </Row>
-              <Row size={1} style={styles.postTitle}>
-                <Text>{ item.title }</Text>
-              </Row>
-            </Grid>
+
+            <View style={styles.post}>
+              <View style={styles.header}>
+                <Thumbnail small source={{uri: item.key}} style={{marginRight: 15}}></Thumbnail>
+                <Text style={styles.username}>{ item.profile.data().username }</Text>
+
+              </View>
+              <View><Image style={styles.image} source={{ uri: item.key }}/></View>
+              <View style={styles.actions}>
+                <Button transparent onPress={this.likePost}>
+                  <Icon name="heart-empty" style={{fontSize: 30}}/>
+                </Button>
+                <Button transparent>
+                  <Icon name="text" style={{fontSize: 30}}/>
+                </Button>
+              </View>
+              <View style={styles.description}>
+                <Text>{ item.description }</Text>
+              </View>
+            </View>
           }/>
         </Content>
       </Container>
@@ -53,16 +61,49 @@ export class ListItems extends Component {
 }
 
 const styles = StyleSheet.create({
-  postTitle: {
-    paddingTop: 20,
-    paddingLeft: 10
+
+  post: {
+    paddingTop: 10,
+    paddingBottom: 30
   },
-  postItem: {
-    paddingBottom: 20
+  header: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingLeft: 10,
   },
-  postImage: {
-    height: 375,
-    width: 375
+  actions: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingLeft: 0,
+    paddingTop: 4
+  },
+  username: { fontWeight: 'bold' },
+  image: { height: 310, width: 375 },
+  description: {
+    flex: 1,
+    flexWrap: 'nowrap',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    paddingLeft: 15,
+    paddingTop: 4
   }
+
+  // postDesc: {
+  //   paddingTop: 20,
+  //   paddingLeft: 10
+  // },
+  // postItem: {
+  //   paddingBottom: 20
+  // },
+  // postImage: {
+  //   height: 375,
+  //   width: 375
+  // }
 })
 

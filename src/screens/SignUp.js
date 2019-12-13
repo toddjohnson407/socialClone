@@ -26,8 +26,9 @@ export class SignUp extends React.Component {
   handleSignUp = () => {
     auth.createUserWithEmailAndPassword(this.state.email, this.state.password).then((res) => {
 
-      let newProfile = newProfile(this.state.username, this.state.name, createTimestamp(), res.user.uid);
-      createProfile(newProfile);
+      let profile = newProfile(this.state.username, this.state.name, createTimestamp(), res.user.uid);
+      console.log(profile);
+      createProfile(profile);
 
     }).catch(error => this.setState({ errorMessage: error.message }))
   }

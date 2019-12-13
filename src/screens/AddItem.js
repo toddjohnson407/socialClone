@@ -26,7 +26,7 @@ let formatPost = (description, imageRef, profileId, created, likes = [], comment
 
 let addPost = (newPost) => {
   db.collection('posts').doc().set(newPost)
-    .then(res => console.log('Success', res))
+    .then(res => console.log('Success'))
     .catch(err => console.log('Error', err))
 };
 
@@ -48,13 +48,13 @@ export class AddItem extends React.Component {
   
   _choosePhoto = async () => {
     selectPhoto()
-      .then(uri => this.setState({ imageUri: uri, uploadStatus: 'Uploaded' }))
+      .then(uri => uri && this.setState({ imageUri: uri, uploadStatus: 'Uploaded' }))
       .catch(err => console.log('Error getting photo from library uri:', err));
   }
 
   _takePhoto = async () => {
     takePhoto()
-      .then(uri => this.setState({ imageUri: uri, uploadStatus: 'Uploaded' }))
+      .then(uri => uri && this.setState({ imageUri: uri, uploadStatus: 'Uploaded' }))
       .catch(err => console.log('Error getting taken photo uri:', err));
   }
 

@@ -120,7 +120,3 @@ export default class App extends React.Component {
   }
   
 };
-
-// rgba(33,240,211,1)
-// openProfile = () => this.setState({ showModal: true });
-// {/* {this.state.showModal && <ProfileModal isVisible={ this.state.showModal }/>} */}

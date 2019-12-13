@@ -32,7 +32,7 @@ let addPost = (newPost) => {
 
 export class AddItem extends React.Component {
 
-  state = { description: '', imageUri: '', errorMessage: null, profile: null };
+  state = { description: '', imageUri: '', errorMessage: null, profile: null, uploadStatus: 'Upload' };
 
   handleSubmit = async () => {
     if (this.state.imageUri && this.state.description) {
@@ -48,13 +48,13 @@ export class AddItem extends React.Component {
   
   _choosePhoto = async () => {
     selectPhoto()
-      .then(uri => this.setState({ imageUri: uri }))
+      .then(uri => this.setState({ imageUri: uri, uploadStatus: 'Uploaded' }))
       .catch(err => console.log('Error getting photo from library uri:', err));
   }
 
   _takePhoto = async () => {
     takePhoto()
-      .then(uri => this.setState({ imageUri: uri }))
+      .then(uri => this.setState({ imageUri: uri, uploadStatus: 'Uploaded' }))
       .catch(err => console.log('Error getting taken photo uri:', err));
   }
 
@@ -95,7 +95,7 @@ export class AddItem extends React.Component {
               </Button>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={styles.selectLabel}>Upload Photo</Text>
+              <Text style={styles.selectLabel}>{this.state.uploadStatus}</Text>
             </View>
           </View>
           <View style={styles.photoDisplay}>
@@ -105,14 +105,14 @@ export class AddItem extends React.Component {
         </View>
 
         <View style={styles.submitPost}>
-
+          {this.state.imageUri ? <Button transparent onPress={this.handleSubmit}>
+            <Icon name="cloud-upload" style={{fontSize: 60, height: 60}}/>
+          </Button> : null}
         </View>
       </View>
     );
   }
 }
-
-
 
 
 const styles = StyleSheet.create({
@@ -156,7 +156,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   submitPost: {
-    flex: 4
+    flex: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   selectLabel: {
     color: '#6a6d6c',

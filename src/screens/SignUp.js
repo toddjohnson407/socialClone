@@ -27,12 +27,11 @@ export class SignUp extends React.Component {
     auth.createUserWithEmailAndPassword(this.state.email, this.state.password).then((res) => {
 
       let profile = newProfile(this.state.username, this.state.name, createTimestamp(), res.user.uid);
-      console.log(profile);
       createProfile(profile);
 
     }).catch(error => this.setState({ errorMessage: error.message }))
   }
-      
+
   goToLogin = () => this.props.navigation.replace('Login');
 
   render() {

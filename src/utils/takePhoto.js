@@ -8,10 +8,10 @@ const options = {
   allowsEditing: true,
 };
 
-export default selectPhoto = async () => {
-  const status = await getPermission(Permissions.CAMERA_ROLL);
+export default takePhoto = async () => {
+  const status = await getPermission(Permissions.CAMERA);
   if (status) {
-    const result = await ImagePicker.launchImageLibraryAsync(options);
+    const result = await ImagePicker.launchCameraAsync(options);
     if (result.cancelled) return '';
     return result.uri;
   } else return '';

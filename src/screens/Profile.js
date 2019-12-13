@@ -5,6 +5,8 @@ import { Button, Form, Grid, Row, Body, Title, Header, Right, Left, Icon, Contai
 import { db, auth, storage } from '../config';
 import getProfile from '../utils/getProfile';
 import getProfilePosts from '../utils/getProfilePosts';
+import selectPhoto from '../utils/selectPhoto';
+import uploadPhoto from '../utils/uploadPhoto';
 
 export class Profile extends React.Component {
 
@@ -17,14 +19,20 @@ export class Profile extends React.Component {
     this.setState({ posts: urls });
   }
 
+  _setAvatar = async () => {
+    let uri = await selectPhoto();
+    if (uri) {
+      let avatarRef = await uploadPhoto(uri, 'avatars');
+      avatarRef && db.collection('profiles').doc(this.state.id).set({ avatarRef }, { merge: true }).then(res => console.log('Avatar Updated')).catch(err => console.log('Error updating avatar', err));
+    }
+  }
+
   async componentDidMount() {
     let profile = await getProfile();
     let posts = await getProfilePosts(profile.id);
-    this.setState({...{posts: []}, ...profile});
+    this.setState({...{posts: [], avatarUri: null}, ...profile});
     await this._loadPosts(posts);
-    console.log(this.state);
-    // this.setState({ posts: await this._loadPosts(posts) });
-    this.setState({ avatarRef: await storage.ref('avatars/testavatar.jpg').getDownloadURL() });
+    this.setState({ avatarUri: await storage.ref(this.state.avatarRef).getDownloadURL() });
   }
 
   render() {
@@ -37,7 +45,9 @@ export class Profile extends React.Component {
         <View style={styles.header}>
 
           <View style={styles.profilePicture}>
-            <Thumbnail large source={{ uri: this.state.avatarRef }}></Thumbnail>
+            <Button transparent large onPress={this._setAvatar}>
+              {this.state.avatarUri ? <Thumbnail style={{ height: 90, width: 90, borderRadius: 45, marginLeft: 12 }} source={{ uri: this.state.avatarUri }}></Thumbnail> : <Icon style={{fontSize: 90, color: 'gray', height: 90}} type="FontAwesome5" name="user-circle"></Icon>}
+            </Button>
           </View>
 
           <View style={styles.subheader}>
@@ -92,27 +102,29 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    justifyContent: 'flex-start',
     alignItems: 'center',
     flexDirection: 'row',
     flexWrap: 'nowrap',
-    paddingRight: 20,
-    paddingLeft: 20,
     backgroundColor: 'white',
-    paddingBottom: 20
+    paddingBottom: 20,
+    marginRight: 5,
+    marginLeft: 5,
   },
   profilePicture: {
     flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
   subheader: {
-    flex: 3,
-    justifyContent: 'space-around',
+    flex: 2,
     alignItems: 'center',
+    justifyContent: 'space-evenly',
     flexDirection: 'row',
-    flexWrap: 'nowrap',
+    flexWrap: 'nowrap'
   },
   headerSection: {
-    flex: 1,
+    marginRight: 8,
+    marginLeft: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -121,7 +133,5 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'black'
   },
-  sectionLabel: {
-    fontSize: 15,
-  }
+  sectionLabel: { fontSize: 15 }
 });

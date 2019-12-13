@@ -47,7 +47,7 @@ const TabNavigator = createMaterialBottomTabNavigator(
     }},
   },
   {
-    initialRouteName: 'Profile',
+    initialRouteName: 'AddItem',
     shifting: false,
     labeled: false,
     activeColor: '#21f0d3',
@@ -104,7 +104,7 @@ export default class App extends React.Component {
         <Container>
           <Header>
             <Left style={{flex:1}}/>
-            <Body style={{flex:1}}>
+            <Body style={{flex:1, alignItems: 'center'}}>
               <Title>ShitGram</Title>
             </Body>
             <Right style={{flex:1}}>

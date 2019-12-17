@@ -2,15 +2,17 @@ import React from 'react';
 import { View, StyleSheet, Text, FlatList, Image } from 'react-native';
 import { Button, Form, Grid, Row, Body, Title, Header, Right, Left, Icon, Container, Content, Thumbnail } from 'native-base';
 
-import { db, auth, storage } from '../config';
+import { db, auth, storage, arrayPush } from '../config';
 import getProfile from '../utils/getProfile';
 import getProfilePosts from '../utils/getProfilePosts';
 import selectPhoto from '../utils/selectPhoto';
 import uploadPhoto from '../utils/uploadPhoto';
 
+const profiles = db.collection('profiles');
+
 export class ProfileView extends React.Component {
 
-  state = {  }
+  state = { profile: null }
 
   /** Set the new avatar in the database */
   _setAvatar = async () => {
@@ -23,8 +25,17 @@ export class ProfileView extends React.Component {
     }
   }
 
+  async componentDidMount() {
+    let profile = await getProfile();
+    this.setState({profile});
+  }
+
+  /** Follows a profile in the database */
   followProfile = () => {
-    console.log('following');
+    Promise.all([
+      profiles.doc(this.props.info.id).update({ followers: arrayPush(this.state.profile.username) }),
+      profiles.doc(this.state.profile.id).update({ following: arrayPush(this.props.info.username) })
+    ]).then(res => console.log('Success')).catch(err => console.log('Error with follows methods to db:', err))
   }
 
   render() {

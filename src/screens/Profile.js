@@ -9,7 +9,6 @@ import selectPhoto from '../utils/selectPhoto';
 import uploadPhoto from '../utils/uploadPhoto';
 import { ProfileView } from './ProfileView';
 
-
 export class Profile extends React.Component {
 
   state = { posts: [], id: null, username: null, avatarRef: null, name: null, bio: null, followers: [], following: [],  }

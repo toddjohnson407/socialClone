@@ -10,6 +10,8 @@ import uploadPhoto from '../utils/uploadPhoto';
 
 export class ProfileView extends React.Component {
 
+  state = {  }
+
   /** Set the new avatar in the database */
   _setAvatar = async () => {
     if (this.props.isSelf) {
@@ -21,7 +23,14 @@ export class ProfileView extends React.Component {
     }
   }
 
+  followProfile = () => {
+    console.log('following');
+  }
+
   render() {
+
+    const followUser = <Button primary small onPress={this.followProfile} style={{paddingTop: 0, paddingBottom: 0, paddingRight: 32, paddingLeft: 32}}><Text style={{ fontWeight: 'bold', color: 'white' }}>Follow</Text></Button>
+
     return (
       <View style={styles.profile}>
         
@@ -52,6 +61,9 @@ export class ProfileView extends React.Component {
             </View>
           </View>
         </View>
+        <View style={styles.followView}> 
+          {this.props.isSelf ? null : followUser}
+        </View>
         <View style={styles.postsCtn}>
           <FlatList numColumns={3} data={this.props.info.posts} renderItem={({item}) => 
             <Image style={styles.post} source={{ uri: item.key }}></Image>
@@ -64,6 +76,13 @@ export class ProfileView extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  followView: {
+    flex: 1,
+    paddingTop: 10,
+    paddingBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   postsCtn: {
     flex: 6,
     paddingTop: 20,

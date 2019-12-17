@@ -2,11 +2,18 @@ import { db, storage, auth } from '../config';
 
 /**
  * This utility method returns the Profile
- * data for the currently signed in user 
+ * data for the currently signed in user or for
+ * a given profile id
+ * 
+ * @param id  Optional profile id
+ * @return    Formatted profile data from the database
  */
-export default getProfile = async () => {
-  let profileData = await db.collection('profiles').where('userId', '==', auth.currentUser.uid).get();
+export default getProfile = async (id?) => {
+
+  let profileData;
+  if (id) (profileData = await db.collection('profiles').doc(id).get());
+  else (profileData = await db.collection('profiles').where('userId', '==', auth.currentUser.uid).get());
 
   if (!profileData) return null;
-  return profileData.docs.map((doc) => ({ ...{ id: doc.id }, ...doc.data() }))[0];
+  return id ? ({...profileData.data(), ...{ id: profileData.id } }) : profileData.docs.map((doc) => ({ ...{ id: doc.id }, ...doc.data() }))[0];
 }

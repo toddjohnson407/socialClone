@@ -1,8 +1,8 @@
 import { db, storage, auth } from '../config';
 
 /**
- * This utility method returns the Profile
- * data for the currently signed in user 
+ * This utility method returns the Profile Posts
+ * data for the provided profileId
  */
 export default getProfilePosts = async (profileId) => {
   let profileData = await db.collection('posts').where('profileId', '==', profileId).get();

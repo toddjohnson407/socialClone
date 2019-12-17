@@ -13,7 +13,9 @@ import { SignUp } from './src/screens/SignUp';
 import { Login } from './src/screens/Login';
 import { Loading } from './src/screens/Loading';
 import { Profile } from './src/screens/Profile';
+import { OtherProfile } from './src/screens/OtherProfile';
 import { Settings } from './src/screens/Settings';
+
 
 import { AppLoading } from 'expo';
 import { Container, Text, StyleProvider, Header, Left, Right, Body, Title, Icon, Button } from 'native-base';
@@ -47,7 +49,7 @@ const TabNavigator = createMaterialBottomTabNavigator(
     }},
   },
   {
-    initialRouteName: 'AddItem',
+    initialRouteName: 'List',
     shifting: false,
     labeled: false,
     activeColor: '#21f0d3',
@@ -68,7 +70,8 @@ const MainNavigator = createStackNavigator(
     Login,
     SignUp,
     Loading,
-    Settings
+    Settings,
+    OtherProfile
   },
   {
     headerMode: 'none',

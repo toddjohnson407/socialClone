@@ -25,9 +25,9 @@ let formatPost = (description, imageRef, profileId, created, likes = [], comment
 }
 
 let addPost = (newPost) => {
-  db.collection('posts').doc().set(newPost)
-    .then(res => console.log('Success'))
-    .catch(err => console.log('Error', err))
+  return db.collection('posts').doc().set(newPost)
+    .then(res => true)
+    .catch(err => false)
 };
 
 export class AddItem extends React.Component {
@@ -42,9 +42,14 @@ export class AddItem extends React.Component {
 
       let newPost = formatPost(this.state.description, imageRef, this.state.profile.id, timestamp);
 
-      addPost(newPost);
+      addPost(newPost).then(res => res && this.resetState());
     }
   };
+
+  /** Resets the components state */
+  resetState() {
+    this.setState({ description: '', imageUri: '', errorMessage: null, profile: null, uploadStatus: 'Upload' });
+  }
   
   _choosePhoto = async () => {
     selectPhoto()

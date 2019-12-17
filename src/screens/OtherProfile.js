@@ -9,8 +9,7 @@ import selectPhoto from '../utils/selectPhoto';
 import uploadPhoto from '../utils/uploadPhoto';
 import { ProfileView } from './ProfileView';
 
-
-export class Profile extends React.Component {
+export class OtherProfile extends React.Component {
 
   state = { posts: [], id: null, username: null, avatarRef: null, name: null, bio: null, followers: [], following: [],  }
 
@@ -24,7 +23,7 @@ export class Profile extends React.Component {
   }
 
   async componentDidMount() {
-    let profile = await getProfile();
+    let profile = await getProfile(this.props.navigation.state.params.id);
     let posts = await getProfilePosts(profile.id);
     this.setState({...{posts: [], avatarUri: null}, ...profile});
     // Load and format posts for the screen
@@ -34,6 +33,6 @@ export class Profile extends React.Component {
   }
 
   render() {
-    return ( <ProfileView info={this.state} isSelf={true} /> );
+    return ( <ProfileView info={this.state} isSelf={false} /> );
   }
 }

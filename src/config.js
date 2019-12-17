@@ -16,6 +16,7 @@ export const storage = Firebase.storage();
 
 export let createTimestamp = () => Firebase.firestore.Timestamp.fromDate(new Date())
 export let arrayPush = (item) => Firebase.firestore.FieldValue.arrayUnion(item)
+export let arrayRemove = (item) => Firebase.firestore.FieldValue.arrayRemove(item)
 
 // TODO: Configure database for offline persistence
 // db.enablePersistence().catch(err => console.log('Error enabling persisting data:', err.code, err))

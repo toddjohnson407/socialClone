@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Text, FlatList, Image } from 'react-native';
 import { Button, Form, Grid, Row, Body, Title, Header, Right, Left, Icon, Container, Content, Thumbnail } from 'native-base';
 
-import { db, auth, storage, arrayPush } from '../config';
+import { db, auth, storage, arrayPush, arrayRemove } from '../config';
 import getProfile from '../utils/getProfile';
 import getProfilePosts from '../utils/getProfilePosts';
 import selectPhoto from '../utils/selectPhoto';
@@ -12,7 +12,7 @@ const profiles = db.collection('profiles');
 
 export class ProfileView extends React.Component {
 
-  state = { profile: null }
+  state = { profile: {}, isFollowing: null }
 
   /** Set the new avatar in the database */
   _setAvatar = async () => {
@@ -27,20 +27,29 @@ export class ProfileView extends React.Component {
 
   async componentDidMount() {
     let profile = await getProfile();
-    this.setState({profile});
+    let isFollowing = this.props.info.followers.includes(profile.username);
+    // console.log(isFollowing);
+    this.setState({profile, isFollowing});
   }
 
   /** Follows a profile in the database */
-  followProfile = () => {
+  toggleFollow = () => {
+    let followerAction = this.props.info.followers.includes(this.state.profile.username) ? arrayRemove(this.state.profile.username) : arrayPush(this.state.profile.username);
+    let followingAction = this.props.info.followers.includes(this.state.profile.username) ? arrayRemove(this.props.info.username) : arrayPush(this.props.info.username);
     Promise.all([
-      profiles.doc(this.props.info.id).update({ followers: arrayPush(this.state.profile.username) }),
-      profiles.doc(this.state.profile.id).update({ following: arrayPush(this.props.info.username) })
-    ]).then(res => console.log('Success')).catch(err => console.log('Error with follows methods to db:', err))
+      profiles.doc(this.props.info.id).update({ followers: followerAction }),
+      profiles.doc(this.state.profile.id).update({ following: followingAction })
+    ]).then(res => console.log('Success')).catch(err => console.log('Error with toggling follow status of profile in db:', err))
+  }
+
+  getFollowStatus = () => {
+    if (this.props.info.followers.includes(this.state.profile.username)) return ( <Text style={{ fontWeight: 'bold', color: 'white' }}>Following</Text> )
+    else return ( <Text style={{ fontWeight: 'bold', color: 'white' }}>Follow</Text> )
   }
 
   render() {
 
-    const followUser = <Button primary small onPress={this.followProfile} style={{paddingTop: 0, paddingBottom: 0, paddingRight: 32, paddingLeft: 32}}><Text style={{ fontWeight: 'bold', color: 'white' }}>Follow</Text></Button>
+    const followUser = <Button primary small onPress={this.toggleFollow} style={{paddingTop: 0, paddingBottom: 0, paddingRight: 32, paddingLeft: 32}}>{this.getFollowStatus()}</Button>
 
     return (
       <View style={styles.profile}>
@@ -62,7 +71,7 @@ export class ProfileView extends React.Component {
               <Text style={styles.sectionLabel}>{this.props.info.posts.length === 1 ? 'Post' : 'Posts'}</Text>
             </View>
             <View style={styles.headerSection}>
-              <Text style={styles.sectionCounter}>{this.props.info.following.length}</Text>
+              <Text style={styles.sectionCounter}>{this.props.info.followers.length}</Text>
               <Text style={styles.sectionLabel}>Followers</Text>
 
             </View>

@@ -28,7 +28,6 @@ export class ProfileView extends React.Component {
   async componentDidMount() {
     let profile = await getProfile();
     let isFollowing = this.props.info.followers.includes(profile.username);
-    // console.log(isFollowing);
     this.setState({profile, isFollowing});
   }
 

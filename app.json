@@ -28,6 +28,9 @@
       "infoPlist": {
         "NSTemporaryExceptionAllowsInsecureHTTPLoads": true
       }
-    }
-  }
+    },
+    "entryPoint": "node_modules/expo/AppEntry.js"
+  },
+  "displayName": "Social Clone",
+  "name": "socialClone"
 }

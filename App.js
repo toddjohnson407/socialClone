@@ -123,3 +123,25 @@ export default class App extends React.Component {
   }
   
 };
+
+
+
+// Expo packages removed from package.json
+
+// deps
+// "@expo/vector-icons": "^10.0.0",
+// "expo": "^35.0.0",
+// "expo-asset": "~7.0.0",
+// "expo-constants": "~7.0.0",
+// "expo-file-system": "~7.0.0",
+// "expo-font": "~7.0.0",
+// "expo-image-picker": "~7.0.0",
+// "expo-permissions": "~7.0.0",
+
+// scripts
+// "web": "expo start --web",
+
+// devdeps
+// "babel-preset-expo": "^7.1.0"
+
+

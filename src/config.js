@@ -10,21 +10,17 @@ Firebase.initializeApp({
   storageBucket: "cloned-a5608.appspot.com",
 });
 
-// TESTING LOCAL DB CONFIG
-// function getMoviesFromApiAsync() {
-//   // return fetch('http://127.0.0.1:3000/api/admin/testmobile')
-//   // return fetch('http://localhost:3000/api/admin/testmobile')
-//   return fetch('https://facebook.github.io/react-native/movies.json')
-//     .then((response) => response.json())
-//     .then((responseJson) => {
-//       return responseJson;
-//     })
-//     .catch((error) => {
-//       console.error('ERROR:', error);
-//     });
-// }
+import Constants from "expo-constants";
+const { manifest } = Constants;
 
-// getMoviesFromApiAsync().then(res => console.log('Fetch Request Complete:', res));
+// TESTING LOCAL DB CONFIG
+function getMoviesFromApiAsync() {
+  return fetch(`http://${manifest.debuggerHost.split(':').shift()}:3000/api/flowskill/all`)
+    .then(response => response.json()).catch(error => ('ERROR 1: ' + error)).then(resJson => resJson)
+    .catch(error => ('ERROR 2: ' + error));
+}
+
+// getMoviesFromApiAsync().then(res => console.log('Fetch Request Complete:', res)).catch(err => console.log('Req Error:', err));
 
 export const db = Firebase.firestore();
 export const auth = Firebase.auth();

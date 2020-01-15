@@ -24,3 +24,6 @@ dist/
 node_modules/
 aws-exports.js
 awsconfiguration.json
+
+# testing manual mobile api routes
+src/apitest.js
